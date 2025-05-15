@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Vexa Live Translation</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        width: 360px;
+        margin: 0;
+        padding: 16px;
+        background-color: #f8f9fa;
+        color: #343a40;
+      }
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 12px;
+      }
+      h1 {
+        font-size: 18px;
+        margin: 0;
+        color: #495057;
+      }
+      .settings-btn {
+        background: transparent;
+        border: none;
+        color: #6c757d;
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+      .settings-btn:hover {
+        color: #495057;
+      }
+      .section {
+        background-color: white;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      }
+      .form-group {
+        margin-bottom: 16px;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #495057;
+      }
+      input[type="text"],
+      select {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 14px;
+      }
+      .btn {
+        display: inline-block;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        font-weight: 500;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+      }
+      .btn-primary {
+        background-color: #007bff;
+        color: white;
+      }
+      .btn-primary:hover {
+        background-color: #0069d9;
+      }
+      .btn-danger {
+        background-color: #dc3545;
+        color: white;
+      }
+      .btn-danger:hover {
+        background-color: #c82333;
+      }
+      .btn-block {
+        display: block;
+        width: 100%;
+      }
+      .status-indicator {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 6px;
+      }
+      .status-active {
+        background-color: #28a745;
+      }
+      .status-inactive {
+        background-color: #dc3545;
+      }
+      .bot-list {
+        max-height: 200px;
+        overflow-y: auto;
+      }
+      .bot-item {
+        padding: 12px;
+        border-bottom: 1px solid #e9ecef;
+      }
+      .bot-item:last-child {
+        border-bottom: none;
+      }
+      .bot-controls {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      .tab-nav {
+        display: flex;
+        margin-bottom: 16px;
+        border-bottom: 1px solid #dee2e6;
+      }
+      .tab-btn {
+        padding: 8px 16px;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        font-weight: 500;
+        color: #6c757d;
+      }
+      .tab-btn.active {
+        border-bottom: 2px solid #007bff;
+        color: #007bff;
+      }
+      #connectTab,
+      #botsTab,
+      #settingsTab {
+        display: none;
+      }
+      .visible {
+        display: block !important;
+      }
+      .error-msg {
+        color: #dc3545;
+        font-size: 14px;
+        margin-top: 8px;
+        display: none;
+      }
+      .success-msg {
+        color: #28a745;
+        font-size: 14px;
+        margin-top: 8px;
+        display: none;
+      }
+      .spinner {
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        border-top: 2px solid #007bff;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1><i class="fas fa-language"></i> Vexa Live Translation</h1>
+    </div>
+
+    <div class="tab-nav">
+      <button id="connectTabBtn" class="tab-btn active">Connect</button>
+      <button id="botsTabBtn" class="tab-btn">My Bots</button>
+      <button id="settingsTabBtn" class="tab-btn">Settings</button>
+    </div>
+
+    <!-- Connect Tab -->
+    <div id="connectTab" class="visible">
+      <div class="section">
+        <div id="meetingDetected" style="display: none">
+          <p>
+            <i class="fas fa-video"></i> Google Meet detected:
+            <span id="currentMeetingId"></span>
+          </p>
+        </div>
+        <div id="noMeetingDetected">
+          <p>
+            <i class="fas fa-exclamation-circle"></i> No Google Meet detected.
+            Please open a Google Meet tab.
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label for="translationLanguage">Translation Language:</label>
+          <select id="translationLanguage">
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="it">Italian</option>
+            <option value="pt">Portuguese</option>
+            <option value="ru">Russian</option>
+            <option value="zh">Chinese</option>
+            <option value="ja">Japanese</option>
+            <option value="ko">Korean</option>
+            <option value="ar">Arabic</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="botName">Bot Name (optional):</label>
+          <input type="text" id="botName" placeholder="VexaTranslator" />
+        </div>
+
+        <button id="connectBtn" class="btn btn-primary btn-block">
+          <i class="fas fa-plug"></i> Connect Translation Bot
+        </button>
+
+        <div id="connectErrorMsg" class="error-msg"></div>
+        <div id="connectSuccessMsg" class="success-msg"></div>
+      </div>
+    </div>
+
+    <!-- Bots Tab -->
+    <div id="botsTab">
+      <div class="section">
+        <div id="botListLoading">
+          <div class="spinner"></div>
+          Loading your bots...
+        </div>
+        <div id="botList" class="bot-list">
+          <!-- Bot items will be inserted here -->
+        </div>
+        <div id="noBots" style="display: none">
+          <p>You don't have any active bots.</p>
+        </div>
+        <button id="refreshBotsBtn" class="btn btn-primary btn-block">
+          <i class="fas fa-sync-alt"></i> Refresh Bot List
+        </button>
+      </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div id="settingsTab">
+      <div class="section">
+        <div
+          style="
+            margin-bottom: 16px;
+            padding: 8px;
+            background-color: #f8d7da;
+            border-radius: 4px;
+            color: #721c24;
+          "
+        >
+          <strong><i class="fas fa-exclamation-circle"></i> Important:</strong>
+          A valid Vexa API key is required for this extension to work.
+        </div>
+
+        <div class="form-group">
+          <label for="apiKey">Vexa API Key:</label>
+          <input
+            type="text"
+            id="apiKey"
+            placeholder="Enter your Vexa API key"
+          />
+          <small style="display: block; margin-top: 8px; color: #6c757d">
+            If you don't have an API key yet, please request one from the Vexa
+            team.
+          </small>
+        </div>
+        <button id="saveSettingsBtn" class="btn btn-primary btn-block">
+          <i class="fas fa-save"></i> Save Settings
+        </button>
+        <div id="settingsErrorMsg" class="error-msg"></div>
+        <div id="settingsSuccessMsg" class="success-msg"></div>
+
+        <div
+          style="
+            margin-top: 20px;
+            border-top: 1px solid #dee2e6;
+            padding-top: 16px;
+          "
+        >
+          <h4 style="font-size: 14px; margin-bottom: 8px">Troubleshooting</h4>
+          <ul style="padding-left: 20px; font-size: 13px; color: #495057">
+            <li>
+              If you're encountering "Failed to request bot" errors, verify your
+              API key is correctly entered.
+            </li>
+            <li>
+              The Vexa API has a limit of one concurrent bot per API key by
+              default.
+            </li>
+            <li>Check the browser console for detailed error messages.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

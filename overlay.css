@@ -1,0 +1,224 @@
+/* Vexa Translator Overlay Styles */
+.vexa-overlay {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  width: 350px;
+  max-height: 500px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  resize: both;
+}
+
+.vexa-overlay.expanded {
+  width: 500px;
+  max-height: 700px;
+}
+
+.vexa-overlay.minimized {
+  height: 50px;
+  overflow: hidden;
+  resize: none;
+}
+
+.vexa-overlay-header {
+  padding: 12px 16px;
+  background-color: #007bff;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: move;
+}
+
+.vexa-overlay-title {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.vexa-overlay-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.vexa-overlay-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 12px;
+}
+
+.vexa-overlay-btn:hover {
+  opacity: 0.8;
+}
+
+.vexa-transparency-control {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 5px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  z-index: 10000;
+  font-size: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.vexa-transparency-control input {
+  width: 80px;
+}
+
+.vexa-language-selector {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+.vexa-language-selector select {
+  padding: 5px 8px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.vexa-transcript-container {
+  padding: 16px;
+  overflow-y: auto;
+  flex-grow: 1;
+  background-color: rgba(255, 255, 255, 0.95);
+  scroll-behavior: smooth;
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+  contain: content;
+  overscroll-behavior: contain;
+}
+
+.vexa-transcript-item {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.vexa-transcript-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.vexa-transcript-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.vexa-transcript-speaker {
+  font-weight: 600;
+  color: #495057;
+}
+
+.vexa-transcript-time {
+  white-space: nowrap;
+}
+
+.vexa-transcript-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #212529;
+}
+
+.vexa-loading {
+  padding: 32px 16px;
+  text-align: center;
+  color: #6c757d;
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+.vexa-spinner {
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: vexa-spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes vexa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.vexa-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Style for the transcript bubbles */
+.vexa-transcript-text {
+  padding: 10px 14px;
+  background-color: #f1f1f1;
+  border-radius: 18px;
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Different colors for different speakers */
+.vexa-transcript-item:nth-child(odd) .vexa-transcript-text {
+  background-color: #e3f2fd;
+}
+
+.vexa-transcript-item:nth-child(even) .vexa-transcript-text {
+  background-color: #f1f8e9;
+}
+
+/* Resize handle style */
+.vexa-overlay:not(.minimized)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 15px;
+  height: 15px;
+  background: linear-gradient(135deg, transparent 50%, #007bff 50%);
+  cursor: nwse-resize;
+  z-index: 10001;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .vexa-overlay {
+    width: calc(100% - 40px);
+    max-height: 400px;
+    top: auto;
+    bottom: 20px;
+  }
+
+  .vexa-overlay.expanded {
+    width: calc(100% - 40px);
+  }
+}
