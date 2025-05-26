@@ -2,13 +2,51 @@
 const BASE_URL = "https://gateway.dev.vexa.ai";
 let API_KEY = "";
 
-// Initialize
-chrome.runtime.onInstalled.addListener(() => {
+// Function to load API key from storage
+function loadApiKeyFromStorage() {
   chrome.storage.local.get(["vexaApiKey"], (result) => {
     if (result.vexaApiKey) {
       API_KEY = result.vexaApiKey;
+      console.log("API key loaded from storage via loadApiKeyFromStorage");
     }
   });
+}
+
+// Function to ensure API key is loaded, trying from storage if not already set
+async function ensureApiKey() {
+  if (API_KEY) {
+    return Promise.resolve();
+  } else {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get(["vexaApiKey"], (result) => {
+        if (result.vexaApiKey) {
+          API_KEY = result.vexaApiKey;
+          console.log("API key loaded from storage via ensureApiKey");
+          resolve();
+        } else {
+          console.error("API key not found in storage via ensureApiKey");
+          reject(new Error("API key not set"));
+        }
+      });
+    });
+  }
+}
+
+// Initialize
+chrome.runtime.onInstalled.addListener(() => {
+  loadApiKeyFromStorage(); // Call the new function during initialization
+});
+
+// Listener for browser startup
+chrome.runtime.onStartup.addListener(() => {
+  console.log("Browser startup detected. Loading API key.");
+  loadApiKeyFromStorage();
+});
+
+// Listener for service worker activation
+self.addEventListener('activate', event => {
+  console.log("Service worker activated. Loading API key.");
+  event.waitUntil(loadApiKeyFromStorage()); // Ensure the promise from storage.local.get resolves
 });
 
 // Listen for messages from popup or content scripts
@@ -129,7 +167,7 @@ async function requestBot(
   language = "en",
   botName = "VexaTranslator"
 ) {
-  if (!API_KEY) throw new Error("API key not set");
+  await ensureApiKey();
 
   console.log("Requesting bot with:", {
     meetingId,
@@ -197,7 +235,7 @@ async function requestBot(
 }
 
 async function getTranscript(meetingId, since = null) {
-  if (!API_KEY) throw new Error("API key not set");
+  await ensureApiKey();
 
   let url = `${BASE_URL}/transcripts/google_meet/${meetingId}`;
 
@@ -222,7 +260,7 @@ async function getTranscript(meetingId, since = null) {
 }
 
 async function getBotStatus() {
-  if (!API_KEY) throw new Error("API key not set");
+  await ensureApiKey();
 
   const response = await fetch(`${BASE_URL}/bots/status`, {
     method: "GET",
@@ -253,7 +291,7 @@ async function getBotStatus() {
 }
 
 async function updateBotConfig(meetingId, config) {
-  if (!API_KEY) throw new Error("API key not set");
+  await ensureApiKey();
 
   const response = await fetch(
     `${BASE_URL}/bots/google_meet/${meetingId}/config`,
@@ -276,7 +314,7 @@ async function updateBotConfig(meetingId, config) {
 }
 
 async function stopBot(meetingId) {
-  if (!API_KEY) throw new Error("API key not set");
+  await ensureApiKey();
 
   const response = await fetch(`${BASE_URL}/bots/google_meet/${meetingId}`, {
     method: "DELETE",
@@ -294,7 +332,7 @@ async function stopBot(meetingId) {
 }
 
 async function listMeetings() {
-  if (!API_KEY) throw new Error("API key not set");
+  await ensureApiKey();
 
   const response = await fetch(`${BASE_URL}/meetings`, {
     method: "GET",
